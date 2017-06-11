@@ -9,10 +9,10 @@
   (assoc
     (shape :filled :set-color (color :magenta) :circle 0 0 4)
     :id :player-ship :body true :x x :y y :vx vx :vy vy))
-(defn planet [[x y]]
+(defn planet [[x y] gm]
   (assoc
     (shape :filled :set-color (color :cyan) :circle 0 0 16)
-    :id :planet :x x :y y :body :planet :gm 10.0))
+    :id :planet :x x :y y :body :planet :gm gm))
 (defn hud-label [text] (assoc (label text (color :white)) :id :hud))
 
 (defn has-id [id entity] (= id (:id entity)))
@@ -22,7 +22,13 @@
 
 (defn format-player-x [entities]
   (let [player (get-by-id :player-ship entities) planet (get-by-id :planet entities)] 
-    (str "fps: " (game :fps) "\ndistance:" (distance player planet))))
+    (str
+      "fps: " (game :fps) "\n"
+      "distance:" (distance player planet) "\n"
+      "x:" (:x player) "\n"
+      "y:" (:y player) "\n"
+      "vx:" (:vx player) "\n"
+      "vy:" (:vy player) "\n")))
 
 (defn update-entity [entities entity]
   (case (:id entity)
@@ -48,8 +54,8 @@
     (add-timer! screen :update-game-state physics-time-step physics-time-step)
     (update! screen :renderer (stage))
     [ 
-     (planet [200.0 200.0])
-     (player-ship [160.0 160.0] [0.0 10.0])
+     (planet [200.0 200.0] 100000.0)
+     (player-ship [200.0 160.0] [40.0 0.0])
      (hud-label "hello world")])
 
   :on-render
