@@ -6,21 +6,25 @@
 
 (defn distance [{ax :x ay :y} {bx :x by :y}] (seq-distance [ax ay] [bx by]))
 
+(defn add-xy [{ax :x ay :y} {by :x bx :y}]
+  {:x (+ ax by) :y (+ ay by)})
+
 (defn integrate-x [dt a v x]
   (+ x (* v dt) (* 0.5 a dt dt)))
 
 (defn integrate-v [dt a new-a v]
   (+ v (* 0.5 (+ a new-a) dt)))
 
-
 (defn integrate [dt element calc-a] 
   (if (:body element)
-    (let [a (calc-a element)]
-      (assoc element
-        :x (integrate-x dt (:x a) (:vx element) (:x element))
-        :y (integrate-x dt (:y a) (:vy element) (:y element))
-        :vx (integrate-v dt (:x a) (:x a) (:vx element))
-        :vy (integrate-v dt (:y a) (:y a) (:vy element))))
+    (let [a (calc-a element)
+          new-position (assoc element
+                         :x (integrate-x dt (:x a) (:vx element) (:x element))
+                         :y (integrate-x dt (:y a) (:vy element) (:y element)))
+          new-a (calc-a new-position)]
+      (assoc new-position
+        :vx (integrate-v dt (:x a) (:x new-a) (:vx element))
+        :vy (integrate-v dt (:y a) (:y new-a) (:vy element))))
     element))
 
 (defn planet? [entity] (= :planet (:body entity)))
@@ -34,9 +38,6 @@
   (if (planet? entity)
     (planet-gravity entity location)
     {:x 0.0 :y 0.0}))
-
-(defn add-xy [{ax :x ay :y} {by :x bx :y}]
-  {:x (+ ax by) :y (+ ay by)})
 
 (defn gravity [entities location]
   (reduce add-xy (map #(entity-gravity % location) entities)))

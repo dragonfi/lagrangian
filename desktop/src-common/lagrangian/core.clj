@@ -5,10 +5,14 @@
 
 (def physics-time-step 0.01)
 
-(defn player-ship [x y]
-  (assoc (image "ship.png") :id :player-ship :body true :x x :y y :vx 10.0 :vy 0.0 :origin-x 8 :origin-y 8))
-(defn planet [x y]
-  (assoc (image "planet.png") :id :planet :width 64 :height 64 :origin-x 32 :origin-y 32 :x x :y y :body :planet :gm 10.0))
+(defn player-ship [[x y] [vx vy]]
+  (assoc
+    (shape :filled :set-color (color :magenta) :circle 0 0 4)
+    :id :player-ship :body true :x x :y y :vx vx :vy vy))
+(defn planet [[x y]]
+  (assoc
+    (shape :filled :set-color (color :cyan) :circle 0 0 16)
+    :id :planet :x x :y y :body :planet :gm 10.0))
 (defn hud-label [text] (assoc (label text (color :white)) :id :hud))
 
 (defn has-id [id entity] (= id (:id entity)))
@@ -44,8 +48,8 @@
     (add-timer! screen :update-game-state physics-time-step physics-time-step)
     (update! screen :renderer (stage))
     [ 
-     (planet 200.0 200.0)
-     (player-ship 180.0 180.0)
+     (planet [200.0 200.0])
+     (player-ship [160.0 160.0] [0.0 10.0])
      (hud-label "hello world")])
 
   :on-render
