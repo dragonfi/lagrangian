@@ -88,6 +88,7 @@
     (update! screen :renderer (stage))
     [ 
      (planet [400.0 300.0] 100000.0)
+     (planet [200.0 300.0] 100000.0)
      (player-ship [400.0 200.0] [20.0 0.0])
      (hud-label "hello world")])
 
