@@ -1,7 +1,9 @@
 (ns lagrangian.core
   (:require [play-clj.core :refer :all]
             [play-clj.ui :refer :all]
-            [lagrangian.vec2d :refer :all]))
+            [lagrangian.vec2d :refer [distance]]
+            [lagrangian.verlet :refer [integrate]]
+            [lagrangian.forces :refer [gravity]]))
 
 (def physics-time-step 0.01)
 
