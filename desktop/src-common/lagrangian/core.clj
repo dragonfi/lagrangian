@@ -1,7 +1,7 @@
 (ns lagrangian.core
   (:require [play-clj.core :refer :all]
             [play-clj.ui :refer :all]
-            [lagrangian.vec2d :refer [distance]]
+            [lagrangian.vec2d :refer [distance add-xy]]
             [lagrangian.verlet :refer [integrate]]
             [lagrangian.forces :refer [gravity]]))
 
@@ -32,9 +32,12 @@
       "vx:" (:vx player) "\n"
       "vy:" (:vy player) "\n")))
 
+(defn acceleration-on-player-ship [entities ship]
+  (add-xy (gravity entities ship) {:x 0.0 :y 0.0}))
+
 (defn update-entity [entities entity]
   (case (:id entity)
-    :player-ship (integrate physics-time-step entity (partial gravity entities))
+    :player-ship (integrate physics-time-step entity (partial acceleration-on-player-ship entities))
     :hud (hud-label (format-player-x entities))
     entity))
 
