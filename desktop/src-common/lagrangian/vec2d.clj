@@ -6,5 +6,14 @@
 
 (defn distance [{ax :x ay :y} {bx :x by :y}] (seq-distance [ax ay] [bx by]))
 
-(defn add-xy [{ax :x ay :y} {by :x bx :y}]
-  {:x (+ ax by) :y (+ ay by)})
+(defn scalar-mult [scalar {x :x y :y}] {:x (* scalar x) :y (* scalar y)})
+
+(defn deg-to-rad [deg]
+  (* deg (/ Math/PI 180)))
+
+(defn unit-from-angle [angle]
+  (let [rad (deg-to-rad angle)]
+    {:x (- (Math/sin rad)) :y (Math/cos rad)}))
+
+(defn add-xy [{ax :x ay :y} {bx :x by :y}]
+  {:x (+ ax bx) :y (+ ay by)})
