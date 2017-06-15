@@ -1,34 +1,31 @@
-(ns lagrangian.verlet)
+(ns lagrangian.verlet
+  (:require [lagrangian.vector :refer [add scale]]))
 
 (defn- body? [element]
-  (every? element [:position :velocity]))
-
-(defn- map-position-to-xy [body]
-  (let [r (body :position)]
-    (assoc body :x (r 0) :y (r 1))))
-
-(defn- integrate-x [dt a v x]
-  (+ x (* v dt) (* 0.5 a dt dt)))
+  (and (:position element) (:velocity element)))
 
 (defn- integrate-v [dt a new-a v]
   (+ v (* 0.5 (+ a new-a) dt)))
 
 (defn- integrate-position [dt a element]
-  "first step of integration"
-  (assoc element
-    :x (integrate-x dt (:x a) (:vx element) (:x element))
-    :y (integrate-x dt (:y a) (:vy element) (:y element))))
+  "first step of integration (r + v dt + 0.5 a dt dt)"
+  (let
+    [ r (:position element)
+      v (:velocity element)]
+    (assoc element :position
+      (add r (scale dt v) (scale (* 0.5 dt dt) a)))))
 
 (defn- integrate-velocity [dt old-a calc-a element]
-  "second step of integration, must call integrate-position first"
-  (let [new-a (calc-a element)]
-    (assoc element
-      :vx (integrate-v dt (:x old-a) (:x new-a) (:vx element))
-      :vy (integrate-v dt (:y old-a) (:y new-a) (:vy element)))))
+  "second step of integration (v + 0.5 (a + new_a) dt), must call integrate-position first"
+  (let
+    [ v (:velocity element)
+      new-a (calc-a element)]
+    (assoc element :velocity
+      (add v (scale (* 0.5 dt) (add old-a new-a))))))
 
-(defn integrate [dt element calc-a] 
+(defn integrate [dt calc-a element] 
   "one step of verlet integration, uses :body :x :y :vx :vy of element"
-  (if (:body element)
+  (if (body? element)
     (let [a (calc-a element)]
       (integrate-velocity dt a calc-a (integrate-position dt a element)))
     element))
